@@ -68,14 +68,14 @@ local plugin_specs = {
       require("config.treesitter")
     end,
   },
-  {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    event = "VeryLazy",
-    branch = "master",
-    config = function()
-      require("config.treesitter-textobjects")
-    end,
-  },
+--  {
+--    "nvim-treesitter/nvim-treesitter-textobjects",
+--    event = "VeryLazy",
+--    branch = "master",
+--    config = function()
+--      require("config.treesitter-textobjects")
+--    end,
+--  },
   { "machakann/vim-swap", event = "VeryLazy" },
 
   -- Super fast buffer jump
@@ -582,72 +582,72 @@ local plugin_specs = {
   },
   { "cespare/vim-toml", ft = { "toml" }, branch = "main" },
 
-  -- Edit text area in browser using nvim
-  {
-    "glacambre/firenvim",
-    init = function()
-      vim.cmd([[
-        """"""""""""""""""""""""""""""firenvim settings""""""""""""""""""""""""""""""
-        if exists('g:started_by_firenvim') && g:started_by_firenvim
-          if g:is_mac
-            set guifont=Iosevka\ Nerd\ Font:h18
-          else
-            set guifont=Consolas
-          endif
+  -- -- Edit text area in browser using nvim
+  -- {
+  --   "glacambre/firenvim",
+  --   init = function()
+  --     vim.cmd([[
+  --       """"""""""""""""""""""""""""""firenvim settings""""""""""""""""""""""""""""""
+  --       if exists('g:started_by_firenvim') && g:started_by_firenvim
+  --         if g:is_mac
+  --           set guifont=Iosevka\ Nerd\ Font:h18
+  --         else
+  --           set guifont=Consolas
+  --         endif
 
-          " general config for firenvim
-          let g:firenvim_config = {
-              \ 'globalSettings': {
-                  \ 'alt': 'all',
-              \  },
-              \ 'localSettings': {
-                  \ '.*': {
-                      \ 'cmdline': 'neovim',
-                      \ 'priority': 0,
-                      \ 'selector': 'textarea',
-                      \ 'takeover': 'never',
-                  \ },
-              \ }
-          \ }
+  --         " general config for firenvim
+  --         let g:firenvim_config = {
+  --             \ 'globalSettings': {
+  --                 \ 'alt': 'all',
+  --             \  },
+  --             \ 'localSettings': {
+  --                 \ '.*': {
+  --                     \ 'cmdline': 'neovim',
+  --                     \ 'priority': 0,
+  --                     \ 'selector': 'textarea',
+  --                     \ 'takeover': 'never',
+  --                 \ },
+  --             \ }
+  --         \ }
 
-          function s:setup_firenvim() abort
-            set signcolumn=no
-            set noruler
-            set noshowcmd
-            set laststatus=0
-            set showtabline=0
-          endfunction
+  --         function s:setup_firenvim() abort
+  --           set signcolumn=no
+  --           set noruler
+  --           set noshowcmd
+  --           set laststatus=0
+  --           set showtabline=0
+  --         endfunction
 
-          augroup firenvim
-            autocmd!
-            autocmd BufEnter * call s:setup_firenvim()
-            autocmd BufEnter sqlzoo*.txt set filetype=sql
-            autocmd BufEnter github.com_*.txt set filetype=markdown
-            autocmd BufEnter stackoverflow.com_*.txt set filetype=markdown
-          augroup END
-        endif
-      ]])
-    end,
-    enabled = function()
-      return vim.g.is_win or vim.g.is_mac
-    end,
-    -- it seems that we can only call the firenvim function directly.
-    -- Using vim.fn or vim.cmd to call this function will fail.
-    build = function()
-      local firenvim_path = vim.fs.joinpath(plugin_dir, "firenvim")
-      vim.opt.runtimepath:append(firenvim_path)
-      vim.cmd("runtime! firenvim.vim")
+  --         augroup firenvim
+  --           autocmd!
+  --           autocmd BufEnter * call s:setup_firenvim()
+  --           autocmd BufEnter sqlzoo*.txt set filetype=sql
+  --           autocmd BufEnter github.com_*.txt set filetype=markdown
+  --           autocmd BufEnter stackoverflow.com_*.txt set filetype=markdown
+  --         augroup END
+  --       endif
+  --     ]])
+  --   end,
+  --   enabled = function()
+  --     return vim.g.is_win or vim.g.is_mac
+  --   end,
+  --   -- it seems that we can only call the firenvim function directly.
+  --   -- Using vim.fn or vim.cmd to call this function will fail.
+  --   build = function()
+  --     local firenvim_path = vim.fs.joinpath(plugin_dir, "firenvim")
+  --     vim.opt.runtimepath:append(firenvim_path)
+  --     vim.cmd("runtime! firenvim.vim")
 
-      -- macOS will reset the PATH when firenvim starts a nvim process, causing the PATH variable to change unexpectedly.
-      -- Here we are trying to get the correct PATH and use it for firenvim.
-      -- See also https://github.com/glacambre/firenvim/blob/master/TROUBLESHOOTING.md#make-sure-firenvims-path-is-the-same-as-neovims
-      local path_env = vim.env.PATH
-      local prologue = string.format('export PATH="%s"', path_env)
-      -- local prologue = "echo"
-      local cmd_str = string.format(":call firenvim#install(0, '%s')", prologue)
-      vim.cmd(cmd_str)
-    end,
-  },
+  --     -- macOS will reset the PATH when firenvim starts a nvim process, causing the PATH variable to change unexpectedly.
+  --     -- Here we are trying to get the correct PATH and use it for firenvim.
+  --     -- See also https://github.com/glacambre/firenvim/blob/master/TROUBLESHOOTING.md#make-sure-firenvims-path-is-the-same-as-neovims
+  --     local path_env = vim.env.PATH
+  --     local prologue = string.format('export PATH="%s"', path_env)
+  --     -- local prologue = "echo"
+  --     local cmd_str = string.format(":call firenvim#install(0, '%s')", prologue)
+  --     vim.cmd(cmd_str)
+  --   end,
+  -- },
 
   -- Session management plugin
   { "tpope/vim-obsession", cmd = "Obsession" },
