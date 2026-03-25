@@ -220,14 +220,14 @@ api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
-api.nvim_create_autocmd({ "VimEnter", "DirChanged" }, {
-  group = api.nvim_create_augroup("git_repo_check", { clear = true }),
-  pattern = "*",
-  desc = "check if we are inside Git repo",
-  callback = function()
-    utils.inside_git_repo()
-  end,
-})
+-- api.nvim_create_autocmd({ "VimEnter", "DirChanged" }, {
+--   group = api.nvim_create_augroup("git_repo_check", { clear = true }),
+--   pattern = "*",
+--   desc = "check if we are inside Git repo",
+--   callback = function()
+--     utils.inside_git_repo()
+--   end,
+-- })
 
 -- ref: https://vi.stackexchange.com/a/169/15292
 api.nvim_create_autocmd("BufReadPre", {

@@ -78,19 +78,19 @@ function M.is_compatible_version(expected_version)
   return true
 end
 
---- check if we are inside a git repo
---- @return boolean
-function M.inside_git_repo()
-  local result = vim.system({ "git", "rev-parse", "--is-inside-work-tree" }, { text = true }):wait()
-  if result.code ~= 0 then
-    return false
-  end
-
-  -- Manually trigger a special user autocmd InGitRepo (used lazyloading.
-  vim.cmd([[doautocmd User InGitRepo]])
-
-  return true
-end
+-- --- check if we are inside a git repo
+-- --- @return boolean
+-- function M.inside_git_repo()
+--   local result = vim.system({ "git", "rev-parse", "--is-inside-work-tree" }, { text = true }):wait()
+--   if result.code ~= 0 then
+--     return false
+--   end
+--
+--   -- Manually trigger a special user autocmd InGitRepo (used lazyloading.
+--   vim.cmd([[doautocmd User InGitRepo]])
+--
+--   return true
+-- end
 
 --- Get custom title string for the window title.
 --- Shows hostname (on Linux), buffer path, and last modified time.

@@ -1,90 +1,13 @@
 local fn = vim.fn
 
--- cache for git states
-local git_status_cache = {
-  fetch_success = false,
-  behind_count = 0,
-  ahead_count = 0,
-}
-
-local on_exit_fetch = function(result)
-  if result.code == 0 then
-    git_status_cache.fetch_success = true
-  end
-end
-
-local function handle_numeric_result(cache_key)
-  return function(result)
-    if result.code == 0 then
-      git_status_cache[cache_key] = tonumber(result.stdout:match("(%d+)")) or 0
-    else
-      -- when the git command fails, it usually means there are some changes in your branch. For example, you
-      -- on branchA, for this one, you have upstream branch. Then you changed to branchB, and there is no upstream
-      -- branch, the git rev-list command will error out. In this case, we should clear the cache
-      -- vim.print("Error running git command", result)
-      git_status_cache[cache_key] = 0
-    end
-  end
-end
-
-local async_cmd = function(cmd_str, on_exit)
-  local cmd = vim.tbl_filter(function(element)
-    return element ~= ""
-  end, vim.split(cmd_str, " "))
-
-  vim.system(cmd, { text = true }, on_exit)
-end
-
-local async_git_status_update = function()
-  -- Fetch the latest changes from the remote repository (replace 'origin' if needed)
-  async_cmd("git fetch origin", on_exit_fetch)
-  if not git_status_cache.fetch_success then
-    return
-  end
-
-  -- Get the number of commits behind
-  -- the @{upstream} notation is inspired by post: https://www.reddit.com/r/neovim/comments/t48x5i/git_branch_aheadbehind_info_status_line_component/
-  -- note that here we should use double dots instead of triple dots
-  local behind_cmd_str = "git rev-list --count HEAD..@{upstream}"
-  async_cmd(behind_cmd_str, handle_numeric_result("behind_count"))
-
-  -- Get the number of commits ahead
-  local ahead_cmd_str = "git rev-list --count @{upstream}..HEAD"
-  async_cmd(ahead_cmd_str, handle_numeric_result("ahead_count"))
-end
-
-local function get_git_ahead_behind_info()
-  async_git_status_update()
-
-  local status = git_status_cache
-  if not status then
-    return ""
-  end
-
-  local msg = ""
-
-  if type(status.ahead_count) == "number" and status.ahead_count > 0 then
-    local ahead_str = string.format("↑[%d] ", status.ahead_count)
-    msg = msg .. ahead_str
-  end
-
-  if type(status.behind_count) == "number" and status.behind_count > 0 then
-    local behind_str = string.format("↓[%d] ", status.behind_count)
-    msg = msg .. behind_str
-  end
-
-  return msg
-end
-
 local function spell()
   if vim.o.spell then
-    return string.format("[SPELL]")
+    return "[SPELL]"
   end
 
   return ""
 end
 
---- show indicator for Chinese IME
 local function ime_state()
   if vim.g.is_mac then
     -- ref: https://github.com/vim-airline/vim-airline/blob/master/autoload/airline/extensions/xkblayout.vim#L11
@@ -139,6 +62,7 @@ local function mixed_indent()
   local tab_indent = fn.search(tab_pat, "nwc")
   local mixed = (space_indent > 0 and tab_indent > 0)
   local mixed_same_line
+
   if not mixed then
     mixed_same_line = fn.search([[\v^(\t+ | +\t)]], "nwc")
     mixed = mixed_same_line > 0
@@ -158,7 +82,7 @@ local function mixed_indent()
   end
 end
 
-local diff = function()
+local function diff()
   local git_status = vim.b.gitsigns_status_dict
   if git_status == nil then
     return
@@ -168,12 +92,14 @@ local diff = function()
   local remove_num = git_status.removed
   local add_num = git_status.added
 
-  local info = { added = add_num, modified = modify_num, removed = remove_num }
-  -- vim.print(info)
-  return info
+  return {
+    added = add_num,
+    modified = modify_num,
+    removed = remove_num,
+  }
 end
 
-local virtual_env = function()
+local function virtual_env()
   -- only show virtual env for Python
   if vim.bo.filetype ~= "python" then
     return ""
@@ -194,10 +120,11 @@ local virtual_env = function()
   end
 end
 
-local get_active_lsp = function()
+local function get_active_lsp()
   local msg = "🚫"
   local buf_ft = vim.api.nvim_get_option_value("filetype", {})
   local clients = vim.lsp.get_clients { bufnr = 0 }
+
   if next(clients) == nil then
     return msg
   end
@@ -209,6 +136,7 @@ local get_active_lsp = function()
       return client.name
     end
   end
+
   return msg
 end
 
@@ -241,10 +169,6 @@ require("lualine").setup {
           return string.sub(name, 1, 20)
         end,
         color = { gui = "italic,bold" },
-      },
-      {
-        get_git_ahead_behind_info,
-        color = { fg = "#E0C479" },
       },
       {
         "diff",
@@ -319,3 +243,5 @@ require("lualine").setup {
   tabline = {},
   extensions = { "quickfix", "fugitive", "nvim-tree" },
 }
+
+-- EOF
