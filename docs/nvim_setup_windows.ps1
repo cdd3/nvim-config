@@ -189,6 +189,22 @@ try {
 
     Ensure-Scoop
 
+    # Scoop uses Git to manage buckets. Install Git before adding any buckets.
+    if (Get-Command scoop -ErrorAction SilentlyContinue) {
+        if (Get-Command git -ErrorAction SilentlyContinue) {
+            Write-Info "Git already available on PATH."
+        } else {
+            Ensure-ScoopPackage git
+
+            # A dry run intentionally does not install Git.
+            if (-not $DryRun -and -not (Get-Command git -ErrorAction SilentlyContinue)) {
+                throw "Git install completed but 'git' command is still not available. Restart your terminal and re-run."
+            }
+        }
+    } else {
+        Write-Info "[DryRun] Would install Git via Scoop before adding buckets."
+    }
+
     if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
         Write-Info "[DryRun] Scoop not present (expected). Would proceed with scoop installs after install."
     } else {
