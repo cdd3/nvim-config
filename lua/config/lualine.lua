@@ -121,7 +121,7 @@ local function virtual_env()
 end
 
 local function get_active_lsp()
-  local msg = "🚫"
+  local msg = "󰅙 "
   local buf_ft = vim.api.nvim_get_option_value("filetype", {})
   local clients = vim.lsp.get_clients { bufnr = 0 }
 
@@ -144,7 +144,7 @@ require("lualine").setup {
   options = {
     icons_enabled = true,
     theme = "auto",
-    component_separators = { left = "⏐", right = "⏐" },
+    component_separators = { left = "│", right = "│" },
     section_separators = "",
     disabled_filetypes = {},
     always_divide_middle = true,
@@ -192,12 +192,12 @@ require("lualine").setup {
     lualine_x = {
       {
         get_active_lsp,
-        icon = "📡",
+        icon = "󰒋 ",
       },
       {
         "diagnostics",
         sources = { "nvim_diagnostic" },
-        symbols = { error = "🆇 ", warn = "⚠️ ", info = "ℹ️ ", hint = " " },
+        symbols = { error = "󰅚 ", warn = "󰀪 ", info = "󰋽 ", hint = "󰌶 " },
       },
       {
         trailing_space,
