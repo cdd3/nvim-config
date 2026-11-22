@@ -85,7 +85,48 @@ The mappings below are defined in `lua/mappings.lua` or `lua/diagnostic-conf.lua
 | `<Space>qw` | Populate quickfix from diagnostics |
 | `<Space>qb` | Populate quickfix from current buffer diagnostics |
 
-The leader key is configured elsewhere; confirm its current value with `:lua print(vim.g.mapleader)`. Use `:map`, `:nmap`, or `:verbose map {lhs}` to inspect the effective mappings, including plugin-defined mappings.
+The leader key is **comma** (`,`), set in `lua/globals.lua`. The literal Space key is also used for some mappings. Use `:verbose map {lhs}` to inspect effective mappings.
+
+### Plugin-specific shortcuts
+
+These mappings were checked against the corresponding active plugin configuration modules. Git shortcuts are defined in `lua/config/fugitive.lua`, but their availability depends on Fugitive actually loading (see known issues).
+
+| Keys | Plugin | Action |
+| --- | --- | --- |
+| `<leader>ff` | fzf-lua | Find files |
+| `<leader>fg` | fzf-lua | Live grep |
+| `<leader>fh` | fzf-lua | Search help tags |
+| `<leader>ft` | fzf-lua | Search tags in current buffer |
+| `<leader>fb` | fzf-lua | Switch buffers |
+| `<leader>fr` | fzf-lua | Search recently opened files |
+| `<Space>s` | nvim-tree | Toggle file tree |
+| `<Space>bp` | bufferline | Pick buffer |
+| `zR` / `zM` | nvim-ufo | Open / close all folds |
+| `zr` | nvim-ufo | Open folds except specified kinds |
+| `<leader>K` | nvim-ufo | Preview folded lines under cursor |
+| `]c` / `[c` | gitsigns | Next / previous change hunk |
+| `<leader>hp` | gitsigns | Preview change hunk |
+| `<leader>hb` | gitsigns | Show full line blame |
+| `<leader>gs` | Fugitive | Git status |
+| `<leader>gw` | Fugitive | Stage current file |
+| `<leader>gc` | Fugitive | Commit |
+| `<leader>gpl` / `<leader>gpu` | Fugitive | Pull / push |
+| `<leader>gbn` | Fugitive | Create branch |
+| `<leader>gbd` | Fugitive | Enter branch deletion command |
+| `<leader>gf` | Fugitive | Enter fetch command |
+| `<leader>gb` (Visual) | Fugitive | Blame selection |
+| `n` / `N` / `*` / `#` | hlslens | Search navigation with match highlighting |
+
+The file tree also has its own plugin-default mappings. Check its built-in help for those operations. This table documents explicit local mappings, not every mapping supplied by plugins.
+
+### Other observed behavior
+
+- Tree-sitter configuration targets Python, C++, Lua, Vimscript, JSON, TOML, YAML, JavaScript, Go, TypeScript, Markdown, shell, and Zsh, with parser installation attempted when appropriate.
+- `lualine` includes Git status, Python virtual environment, attached LSP client, diagnostics, trailing-whitespace and mixed-indentation indicators.
+- `lazydev.nvim` enhances Lua language-server workspace metadata but does **not** itself install or enable a language server.
+- Saving Python or Lua files runs an optional formatting **check** using `black --check` or `stylua --check`, respectively, when the executable exists. This is not automatic formatting.
+- Search via `fzf-lua` may depend on external search utilities; `rg` is also used as the configured grep program when present.
+
 
 ## Maintenance and troubleshooting
 
@@ -99,10 +140,10 @@ This configuration deliberately retains some disabled plugin specifications for 
 
 ### Known items to verify
 
-- **Fugitive loading:** `vim-fugitive` uses the custom `User InGitRepo` event, while a related event-triggering helper in `lua/utils.lua` is commented out. Verify whether another module emits this event before assuming Fugitive loads automatically.
-- **Version policy:** `init.lua` checks for exactly 0.12.6; decide whether this should remain an exact-version advisory or become a minimum-version check.
+- **Fugitive loading:** `vim-fugitive` uses `User InGitRepo`. Both the event-triggering helper in `lua/utils.lua` and the corresponding autocommand in `lua/custom-autocmd.lua` are commented out. No active trigger was found in the reviewed modules; verify loading at runtime before relying on the Git mappings.
+- **Theme selection:** `init.lua` returns before calling `color_scheme.rand_colorscheme()`, leaving that call unreachable. The theme plugins are declared, but automatic random theme selection is not active through this path.\n- **Version policy:** `init.lua` checks for exactly 0.12.6; decide whether this should remain an exact-version advisory or become a minimum-version check.
 - **Platform coverage:** Linux, macOS, and Windows are detected, but plugin behavior and dependencies vary. Verify each platform before claiming identical support.
-- **Keybinding reference:** plugin-specific mappings should be audited in `lua/config/` before publishing an exhaustive shortcut table.
+- **Keybinding scope:** the documented mappings were checked in the relevant plugin modules, but this is not an exhaustive inventory of plugin-default mappings or every optional/disabled configuration module.
 
 ## Attribution
 
